@@ -1,0 +1,71 @@
+- name: Ensure the user exists, fails if not
+  ansible.builtin.user:
+    name: "{{ zsh__user }}"
+  become: true
+  check_mode: yes
+  register: user_check
+  failed_when: user_check is failed
+  changed_when: false
+
+- name: Install ZSH
+  ansible.builtin.package:
+    name: zsh
+    state: present
+  become: true
+
+# Must be executed as the user to install Oh My Zsh correctly
+- name: Install Oh My Zsh
+  ansible.builtin.shell:
+    cmd: 'export USER={{ zsh__user }} && export HOME=/home/{{ zsh__user }} && echo "n" | sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+    chdir: /home/{{ zsh__user }}
+  args:
+    creates: /home/{{ zsh__user }}/.oh-my-zsh/oh-my-zsh.sh # skips the command if this file exists. TODO: Change this?
+  become_user: "{{ zsh__user }}"
+  become: true
+
+- name: Make ZSH the default shell for the user
+  ansible.builtin.user:
+    name: "{{ zsh__user }}"
+    shell: /bin/zsh
+  become: true
+
+- name: Copy the ZSH config
+  ansible.builtin.copy:
+    src: zsh/ # stored in roles/basics/files/zsh
+    dest: /home/{{ zsh__user }}/
+    owner: "{{ zsh__user }}"
+    group: "{{ zsh__user }}"
+    mode: "0644"
+
+- name: Modify .p10k.zsh to set background color
+  ansible.builtin.lineinfile:
+    path: /home/{{ zsh__user }}/.p10k.zsh
+    search_string: "typeset -g POWERLEVEL9K_DIR_BACKGROUND="
+    line: "typeset -g POWERLEVEL9K_DIR_BACKGROUND={{ zsh__background_color }}"
+  tags: p10k_config
+
+- name: "Install Oh My ZSH plugin: zsh-autosuggestions"
+  ansible.builtin.git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions
+    dest: /home/{{ zsh__user }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+  become_user: "{{ zsh__user }}"
+  become: true
+
+- name: "Install Oh My ZSH plugin: zsh-syntax-highlighting"
+  ansible.builtin.git:
+    repo: https://github.com/zsh-users/zsh-syntax-highlighting
+    dest: /home/{{ zsh__user }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+  become_user: "{{ zsh__user }}"
+  become: true
+
+- name: Install p10k theme
+  ansible.builtin.git:
+    repo: https://github.com/romkatv/powerlevel10k
+    dest: /home/{{ zsh__user }}/.oh-my-zsh/custom/themes/powerlevel10k
+  become_user: "{{ zsh__user }}"
+  become: true
+
+- name: Tell user to install the font
+  ansible.builtin.debug:
+    msg: |
+      Please install the Mononoki Nerd Font from: https://www.nerdfonts.com/font-downloads and set it in your terminal settings.

@@ -1,0 +1,4 @@
+
+proxmox_node__users:
+  - name: "thomas"
+  - name: "emre"

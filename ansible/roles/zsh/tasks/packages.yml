@@ -1,0 +1,11 @@
+- name: Install curl
+  ansible.builtin.package:
+    name: curl
+    state: present
+  become: true
+
+- name: Install git
+  ansible.builtin.package:
+    name: git
+    state: present
+  become: true

@@ -1,0 +1,25 @@
+# Ensure we have a secure SSH server configuration
+
+- name: Install OpenSSH server package
+  apt:
+    name: openssh-server
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Ensure SSH service is enabled and started
+  service:
+    name: ssh
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Copy SSH server settings
+  copy:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: "0600"
+  notify: Restart SSH
+  become: yes

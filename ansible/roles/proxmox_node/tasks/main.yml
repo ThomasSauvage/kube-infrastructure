@@ -1,0 +1,105 @@
+- name: "Ensure variables are defined"
+  ansible.builtin.assert:
+    that:
+      - proxmox_node__public_ipv4 is defined
+      - proxmox_node__public_ipv4 != ""
+      - proxmox_node__public_ipv4_subnet is defined
+      - proxmox_node__public_ipv4_subnet != ""
+      - proxmox_node__public_ipv4_gateway is defined
+      - proxmox_node__public_ipv4_gateway != ""
+      - proxmox_node__public_interface is defined
+      - proxmox_node__public_interface != ""
+      - proxmox_node__users is defined
+      - proxmox_node__users | length > 0
+    fail_msg: "One or more required variables for proxmox_node role are not defined."
+  become: true
+
+- name: "Configure /etc/hosts with public IPv4"
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: "^{{ proxmox_node__public_ipv4 }}"
+    line: "{{ proxmox_node__public_ipv4 }}  {{ ansible_hostname }}"
+  become: true
+
+- name: "Download GPG keys for PXVirt"
+  ansible.builtin.get_url:
+    url: "https://mirrors.lierfang.com/pxcloud/lierfang.gpg"
+    dest: /etc/apt/trusted.gpg.d/lierfang.gpg
+    mode: "0644"
+  become: true
+
+- name: "Add PXVirt repository"
+  ansible.builtin.apt_repository:
+    repo: "deb https://mirrors.lierfang.com/pxcloud/pxvirt {{ ansible_distribution_release }} main"
+    filename: pxvirt-sources
+    state: present
+  become: true
+
+- name: "Disable NetworkManager"
+  ansible.builtin.systemd:
+    name: NetworkManager
+    enabled: false
+    state: stopped
+  become: true
+
+- name: "Install ifupdown2 package"
+  ansible.builtin.apt:
+    name: ifupdown2
+    state: present
+    update_cache: true
+  become: true
+
+- name: "Delete existing /etc/network/interfaces.new file"
+  ansible.builtin.file:
+    path: /etc/network/interfaces.new
+    state: absent
+  become: true
+
+- name: "Deploy new /etc/network/interfaces file"
+  ansible.builtin.template:
+    src: interfaces
+    dest: /etc/network/interfaces
+  become: true
+
+# You might need to reboot before this step...
+- name: "Reload networking to apply new configuration"
+  ansible.builtin.command: ifreload -a
+  become: true
+
+- name: "Install proxmox packages"
+  ansible.builtin.apt:
+    name:
+      - proxmox-ve
+      - pve-manager
+      - qemu-server
+      - pve-cluster
+    state: present
+    update_cache: true
+  become: true
+
+- name: Disable root user
+  ansible.builtin.command: "pveum user modify root@pam --enable 0"
+  become: true
+
+- name: Create admins group
+  ansible.builtin.command: "pveum group add admins"
+  ignore_errors: true # Returns error if the group already exists
+  become: true
+
+- name: Give admins group admin privileges
+  ansible.builtin.command: "pveum acl modify / --group admins --role Administrator"
+  become: true
+
+- name: Create Proxmox users
+  ansible.builtin.command: "pveum user add {{ item.name }}@pve --groups 'admins'"
+  loop: "{{ proxmox_node__users }}"
+  ignore_errors: true # Returns error if the user already exists
+  become: true
+
+- name: Create LXC template for Debian (arm64)
+  ansible.builtin.include_tasks:
+    file: create_lxc_template.yml
+
+- name: Advise admin to set user passwords
+  ansible.builtin.debug:
+    msg: "If not done already, you might want to set the passwords of Proxmox users by running: 'sudo pveum passwd [userid]@pve'"

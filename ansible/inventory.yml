@@ -1,0 +1,15 @@
+servers:
+  children:
+    proxmox_node: {}
+    proxmox_containers: {}
+
+proxmox_node:
+  hosts:
+    kube-thomas:
+      ansible_ssh_host: kube-thomas
+    kube-emre:
+      ansible_ssh_host: kube-emre
+
+# For non-Talos proxmox containers
+proxmox_containers:
+  hosts:

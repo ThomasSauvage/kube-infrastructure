@@ -1,0 +1,14 @@
+- name: Install everything for Proxmox nodes on Raspberry Pis
+  hosts: proxmox_node
+
+  roles:
+    - role: git_config
+      tags: git
+    - role: proxmox_node
+      tags: proxmox
+    - role: ssh_server
+      tags: ssh_server
+    - role: motd
+      tags: motd
+    - role: users
+      tags: users

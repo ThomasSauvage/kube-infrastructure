@@ -1,0 +1,3 @@
+git_config__user_name: "Thomas Sauvage"
+git_config__user_email: "thomas-commits@sauvage.pm"
+git_config__signing_key: "~/.ssh/id_ed25519.pub"

@@ -1,0 +1,9 @@
+# Those are the formats that should be used for encrypting secrets
+*.secrets.k8s.yml filter=git-crypt diff=git-crypt
+*.secrets.yml filter=git-crypt diff=git-crypt
+*.secrets filter=git-crypt diff=git-crypt
+
+
+# Those are here for security reasons, to avoid accidental commits
+# but shouldn't be used as file names
+*secret* filter=git-crypt diff=git-crypt
