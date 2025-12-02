@@ -1,4 +1,4 @@
-- name: Install everything for Proxmox nodes on Raspberry Pis
+- name: Install everything for Proxmox nodes
   hosts: proxmox_node
 
   roles:

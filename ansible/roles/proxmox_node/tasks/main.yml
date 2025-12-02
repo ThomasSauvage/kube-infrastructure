@@ -14,6 +14,18 @@
     fail_msg: "One or more required variables for proxmox_node role are not defined."
   become: true
 
+- name: Set the hostname to match the inventory
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+  become: true
+
+# Refetch ansible hostname
+- name: Refetch ansible hostname after change
+  ansible.builtin.setup:
+    gather_subset:
+      - "network"
+  become: true
+
 - name: "Configure /etc/hosts with public IPv4"
   ansible.builtin.lineinfile:
     path: /etc/hosts
@@ -21,25 +33,27 @@
     line: "{{ proxmox_node__public_ipv4 }}  {{ ansible_hostname }}"
   become: true
 
-- name: "Download GPG keys for PXVirt"
-  ansible.builtin.get_url:
-    url: "https://mirrors.lierfang.com/pxcloud/lierfang.gpg"
-    dest: /etc/apt/trusted.gpg.d/lierfang.gpg
+- name: "Disable cloud-init network configuration"
+  ansible.builtin.copy:
+    dest: /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+    content: |
+      # Disable cloud-init network configuration
+      network: {config: disabled}
     mode: "0644"
   become: true
 
-- name: "Add PXVirt repository"
-  ansible.builtin.apt_repository:
-    repo: "deb https://mirrors.lierfang.com/pxcloud/pxvirt {{ ansible_distribution_release }} main"
-    filename: pxvirt-sources
-    state: present
+- name: "Download GPG keys for Proxmox"
+  ansible.builtin.get_url:
+    url: "https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg"
+    dest: /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
+    mode: "0644"
   become: true
 
-- name: "Disable NetworkManager"
-  ansible.builtin.systemd:
-    name: NetworkManager
-    enabled: false
-    state: stopped
+- name: "Add Proxmox repository"
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64] http://download.proxmox.com/debian/pve bookworm pve-no-subscription"
+    state: present
+    filename: pve-install-repo
   become: true
 
 - name: "Install ifupdown2 package"
@@ -66,15 +80,39 @@
   ansible.builtin.command: ifreload -a
   become: true
 
-- name: "Install proxmox packages"
+- name: "Install proxmox kernel"
+  ansible.builtin.apt:
+    name:
+      - proxmox-default-kernel
+    state: present
+    update_cache: true
+  become: true
+
+- name: Advise to reboot now
+  ansible.builtin.debug:
+    msg: "It is recommended to reboot the Proxmox node now to ensure the new kernel is in use."
+
+- name: Install proxmox packages
   ansible.builtin.apt:
     name:
       - proxmox-ve
-      - pve-manager
-      - qemu-server
-      - pve-cluster
+      - postfix
+      - open-iscsi
+      - chrony
     state: present
     update_cache: true
+  become: true
+
+- name: Remove ubuntu linux image
+  ansible.builtin.apt:
+    name: linux-image-amd64 'linux-image-6.1*'
+    state: absent
+  become: true
+
+- name: Remove os-prober
+  ansible.builtin.apt:
+    name: os-prober
+    state: absent
   become: true
 
 - name: Disable root user
