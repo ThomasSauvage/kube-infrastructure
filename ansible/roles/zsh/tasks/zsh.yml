@@ -13,6 +13,14 @@
     state: present
   become: true
 
+# This is a fix to allow the following task.
+# This is necessary to use become from a unprivileged user to an unprivileged user
+# This will work only if both users are in the same group
+# Here, we use the 'sudo' group but it can be any group that both users share
+- name: Set ansible_common_remote_group
+  ansible.builtin.set_fact:
+    ansible_common_remote_group: "sudo"
+
 # Must be executed as the user to install Oh My Zsh correctly
 - name: Install Oh My Zsh
   ansible.builtin.shell:
@@ -36,13 +44,14 @@
     owner: "{{ zsh__user }}"
     group: "{{ zsh__user }}"
     mode: "0644"
+  become: true
 
 - name: Modify .p10k.zsh to set background color
   ansible.builtin.lineinfile:
     path: /home/{{ zsh__user }}/.p10k.zsh
     search_string: "typeset -g POWERLEVEL9K_DIR_BACKGROUND="
     line: "typeset -g POWERLEVEL9K_DIR_BACKGROUND={{ zsh__background_color }}"
-  tags: p10k_config
+  become: true
 
 - name: "Install Oh My ZSH plugin: zsh-autosuggestions"
   ansible.builtin.git:

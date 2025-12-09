@@ -3,7 +3,22 @@
 ## Installation
 
 - Install `git` and clone this repo
-- Install Ansible: `sudo apt install ansible` or `sudo dnf install ansible`
+- Install `python3`, `python3-venv` and `python3-pip`
+
+- Create the venv
+
+```sh
+cd ansible
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+- Install dependencies (Ansible...)
+
+```sh
+pip3 install -r requirements.pip
+```
+
 - Install collections
 
 ```sh
@@ -12,11 +27,10 @@ ansible-galaxy install -r requirements.yml
 
 ## Usage
 
-Note: The "become" password is the password of the current Linux user. On computers with a **fingerprint** reader, you might need t press the fingerprint reader when the playbook stalls out (nothing will be displayed).
-
 - Apply config
 
 ```sh
+source .venv/bin/activate
 ansible-playbook playbooks/proxmox_node.yml
 ansible-playbook playbooks/proxmox_containers.yml
 ```

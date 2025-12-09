@@ -1,5 +1,4 @@
-
-proxmox_node__public_ipv4: "137.194.210.65"
+proxmox_node__public_ipv4: "137.194.211.13"
 proxmox_node__public_ipv4_subnet: "/23"
 proxmox_node__public_ipv4_gateway: "137.194.210.12"
 proxmox_node__public_interface: "ens3"

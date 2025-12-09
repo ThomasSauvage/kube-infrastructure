@@ -5,10 +5,10 @@ servers:
 
 proxmox_node:
   hosts:
-    brot-thomas:
-      ansible_ssh_host: brot-thomas
-    brot-emre:
-      ansible_ssh_host: brot-emre
+    brot-1:
+      ansible_ssh_host: brot-1
+    brot-2:
+      ansible_ssh_host: brot-2
 
 # For non-Talos proxmox containers
 proxmox_containers:

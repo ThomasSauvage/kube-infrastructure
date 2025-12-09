@@ -1,11 +1,10 @@
-# Ensure we have a secure SSH server configuration
-
-- name: Install OpenSSH server package
-  apt:
-    name: openssh-server
-    state: present
-    update_cache: yes
-  become: yes
+# This one should be already installed as we use SSH for Ansible connections
+# - name: Install OpenSSH server package
+#   apt:
+#     name: openssh-server
+#     state: present
+#     update_cache: yes
+#   become: yes
 
 - name: Ensure SSH service is enabled and started
   service:
