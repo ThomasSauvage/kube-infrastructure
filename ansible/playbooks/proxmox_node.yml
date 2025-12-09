@@ -9,4 +9,4 @@
     - role: ssh_server
       tags: ssh_server
     - role: proxmox_node
-      tags: proxmox
+      tags: proxmox_node

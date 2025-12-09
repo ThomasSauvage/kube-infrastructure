@@ -17,19 +17,26 @@
 - name: Setup networking before installing Proxmox
   ansible.builtin.include_tasks:
     file: network.yml
-  tags: proxmox-node-networking
+    apply:
+      tags:
+        - proxmox_node_networking
+  tags: proxmox_node_networking
+
+- name: Raises an error every time
+  ansible.builtin.fail:
+    msg: "TODO: Remove this"
 
 - name: Install proxmox kernel
   ansible.builtin.include_tasks:
     file: install_kernel.yml
-  tags: proxmox-node-kernel
+  tags: proxmox_node_kernel
 
 - name: Install other proxmox packages
   ansible.builtin.include_tasks:
     file: install_other_packages.yml
-  tags: proxmox-node-other-packages
+  tags: proxmox_node_other_packages
 
 - name: Configure Proxmox settings
   ansible.builtin.include_tasks:
     file: config_proxmox.yml
-  tags: proxmox-node-config
+  tags: proxmox_node_config

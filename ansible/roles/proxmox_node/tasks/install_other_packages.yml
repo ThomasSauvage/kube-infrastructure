@@ -9,9 +9,9 @@
     update_cache: true
   become: true
 
-- name: Remove ubuntu linux image
+- name: Remove Debian linux image
   ansible.builtin.apt:
-    name: linux-image-amd64 'linux-image-6.1*'
+    name: linux-image-amd64 'linux-image-6.12*'
     state: absent
   become: true
 

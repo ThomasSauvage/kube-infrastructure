@@ -49,5 +49,5 @@
   ansible.builtin.debug:
     msg: |
       The network configuration has been updated.
-      A networking restart using 'ifreload -a' should be performed to apply the changes.
+      A networking restart using 'sudo ifreload -a' should be performed to apply the changes.
       You could also reboot the node to ensure all changes take effect.
