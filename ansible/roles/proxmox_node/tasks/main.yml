@@ -14,130 +14,22 @@
     fail_msg: "One or more required variables for proxmox_node role are not defined."
   become: true
 
-- name: Set the hostname to match the inventory
-  ansible.builtin.hostname:
-    name: "{{ inventory_hostname }}"
-  become: true
-
-# Refetch ansible hostname
-- name: Refetch ansible hostname after change
-  ansible.builtin.setup:
-    gather_subset:
-      - "network"
-  become: true
-
-- name: "Configure /etc/hosts with public IPv4"
-  ansible.builtin.lineinfile:
-    path: /etc/hosts
-    regexp: "^{{ proxmox_node__public_ipv4 }}"
-    line: "{{ proxmox_node__public_ipv4 }}  {{ ansible_hostname }}"
-  become: true
-
-- name: "Disable cloud-init network configuration"
-  ansible.builtin.copy:
-    dest: /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
-    content: |
-      # Disable cloud-init network configuration
-      network: {config: disabled}
-    mode: "0644"
-  become: true
-
-- name: "Download GPG keys for Proxmox"
-  ansible.builtin.get_url:
-    url: "https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg"
-    dest: /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
-    mode: "0644"
-  become: true
-
-- name: "Add Proxmox repository"
-  ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64] http://download.proxmox.com/debian/pve bookworm pve-no-subscription"
-    state: present
-    filename: pve-install-repo
-  become: true
-
-- name: "Install ifupdown2 package"
-  ansible.builtin.apt:
-    name: ifupdown2
-    state: present
-    update_cache: true
-  become: true
-
-- name: "Delete existing /etc/network/interfaces.new file"
-  ansible.builtin.file:
-    path: /etc/network/interfaces.new
-    state: absent
-  become: true
-
-- name: "Deploy new /etc/network/interfaces file"
-  ansible.builtin.template:
-    src: interfaces
-    dest: /etc/network/interfaces
-  become: true
-
-# You might need to reboot before this step...
-- name: "Reload networking to apply new configuration"
-  ansible.builtin.command: ifreload -a
-  become: true
-
-- name: "Install proxmox kernel"
-  ansible.builtin.apt:
-    name:
-      - proxmox-default-kernel
-    state: present
-    update_cache: true
-  become: true
-
-- name: Advise to reboot now
-  ansible.builtin.debug:
-    msg: "It is recommended to reboot the Proxmox node now to ensure the new kernel is in use."
-
-- name: Install proxmox packages
-  ansible.builtin.apt:
-    name:
-      - proxmox-ve
-      - postfix
-      - open-iscsi
-      - chrony
-    state: present
-    update_cache: true
-  become: true
-
-- name: Remove ubuntu linux image
-  ansible.builtin.apt:
-    name: linux-image-amd64 'linux-image-6.1*'
-    state: absent
-  become: true
-
-- name: Remove os-prober
-  ansible.builtin.apt:
-    name: os-prober
-    state: absent
-  become: true
-
-- name: Disable root user
-  ansible.builtin.command: "pveum user modify root@pam --enable 0"
-  become: true
-
-- name: Create admins group
-  ansible.builtin.command: "pveum group add admins"
-  ignore_errors: true # Returns error if the group already exists
-  become: true
-
-- name: Give admins group admin privileges
-  ansible.builtin.command: "pveum acl modify / --group admins --role Administrator"
-  become: true
-
-- name: Create Proxmox users
-  ansible.builtin.command: "pveum user add {{ item.name }}@pve --groups 'admins'"
-  loop: "{{ proxmox_node__users }}"
-  ignore_errors: true # Returns error if the user already exists
-  become: true
-
-- name: Create LXC template for Debian (arm64)
+- name: Setup networking before installing Proxmox
   ansible.builtin.include_tasks:
-    file: create_lxc_template.yml
+    file: network.yml
+  tags: proxmox-node-networking
 
-- name: Advise admin to set user passwords
-  ansible.builtin.debug:
-    msg: "If not done already, you might want to set the passwords of Proxmox users by running: 'sudo pveum passwd [userid]@pve'"
+- name: Install proxmox kernel
+  ansible.builtin.include_tasks:
+    file: install_kernel.yml
+  tags: proxmox-node-kernel
+
+- name: Install other proxmox packages
+  ansible.builtin.include_tasks:
+    file: install_other_packages.yml
+  tags: proxmox-node-other-packages
+
+- name: Configure Proxmox settings
+  ansible.builtin.include_tasks:
+    file: config_proxmox.yml
+  tags: proxmox-node-config

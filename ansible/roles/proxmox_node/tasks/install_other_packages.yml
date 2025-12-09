@@ -1,0 +1,22 @@
+- name: Install proxmox packages
+  ansible.builtin.apt:
+    name:
+      - proxmox-ve
+      - postfix
+      - open-iscsi
+      - chrony
+    state: present
+    update_cache: true
+  become: true
+
+- name: Remove ubuntu linux image
+  ansible.builtin.apt:
+    name: linux-image-amd64 'linux-image-6.1*'
+    state: absent
+  become: true
+
+- name: Remove os-prober
+  ansible.builtin.apt:
+    name: os-prober
+    state: absent
+  become: true

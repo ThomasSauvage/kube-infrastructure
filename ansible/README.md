@@ -34,3 +34,5 @@ source .venv/bin/activate
 ansible-playbook playbooks/proxmox_node.yml
 ansible-playbook playbooks/proxmox_containers.yml
 ```
+
+Note: when installing Proxmox, run each task file one by one (see [proxmox_node/tasks/main.yml](roles/proxmox_node/tasks/main.yml)) using the provided tags. This is required as multiple restarts are necessary during install.
