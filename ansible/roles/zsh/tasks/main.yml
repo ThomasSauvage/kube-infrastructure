@@ -1,5 +1,0 @@
-- name: Install required packages
-  ansible.builtin.import_tasks: packages.yml
-
-- name: Install ZSH
-  ansible.builtin.import_tasks: zsh.yml

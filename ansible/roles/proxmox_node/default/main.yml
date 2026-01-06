@@ -1,8 +1,0 @@
-# By public I mean the IP address of the external interface
-# It can be local for exemple through a NAT
-proxmox_node__public_ipv4: ""
-proxmox_node__public_ipv4_subnet: "" # e.g. "/24"
-proxmox_node__public_ipv4_gateway: ""
-proxmox_node__public_interface: "" # e.g. "eth0"
-
-proxmox_node__users: []

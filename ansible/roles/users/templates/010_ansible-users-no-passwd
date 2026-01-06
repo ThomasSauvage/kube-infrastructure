@@ -1,6 +1,0 @@
-# {{ ansible_managed }}
-# Gives all users in the 'users__users' variable no password sudo access
-
-{% for user in users__users %}
-{{ user.name }} ALL=(ALL) NOPASSWD: ALL
-{% endfor %}
