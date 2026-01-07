@@ -1,3 +1,12 @@
 # BRoT: BR over Télécom
 
-Setting up BR22 over Télécom's network.
+## Installation
+
+cf. [Talos-over-Proxmox configuration](./COOKBOOK.md)
+
+## Usage
+
+```sh
+export KUBECONFIG=$(pwd)/kubeconfig.secrets.yml
+kubectl get nodes
+```
