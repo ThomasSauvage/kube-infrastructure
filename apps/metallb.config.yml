@@ -1,3 +1,15 @@
+# Give sufficient rights to MetalLB namespace
+apiVersion: v1
+kind: Namespace
+
+metadata:
+  name: metallb-system
+  labels:
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged
+
+---
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
@@ -8,6 +20,7 @@ metadata:
 spec:
   addresses:
     - 192.168.1.250/32
+
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
