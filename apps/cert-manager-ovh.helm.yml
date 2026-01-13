@@ -8,11 +8,6 @@ metadata:
 spec:
   project: default
 
-  source:
-    chart: cert-manager-webhook-ovh
-    repoURL: https://aureq.github.io/cert-manager-webhook-ovh/
-    targetRevision: 0.8.0
-
   destination:
     name: in-cluster
     namespace: cert-manager
@@ -24,6 +19,11 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+
+  source:
+    chart: cert-manager-webhook-ovh
+    repoURL: https://aureq.github.io/cert-manager-webhook-ovh/
+    targetRevision: 0.8.0
 
     helm:
       releaseName: cert-manager-webhook-ovh-charts
