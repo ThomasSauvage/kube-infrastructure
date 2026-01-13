@@ -15,11 +15,9 @@ kind: IPAddressPool
 metadata:
   name: main-pool
   namespace: metallb-system
-  # annotations:
-  #   argocd.argoproj.io/sync-wave: "5" # Deploys after the operator
 spec:
   addresses:
-    - 192.168.1.250/32
+    - 192.168.1.250-192.168.1.253
 
 ---
 apiVersion: metallb.io/v1beta1
@@ -27,8 +25,6 @@ kind: L2Advertisement
 metadata:
   name: l2-loadbalancer
   namespace: metallb-system
-  # annotations:
-  #   argocd.argoproj.io/sync-wave: "5" # Deploys after the operator
 spec:
   ipAddressPools:
     - main-pool
