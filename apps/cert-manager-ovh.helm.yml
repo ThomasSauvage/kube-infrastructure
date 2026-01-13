@@ -1,0 +1,389 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+
+metadata:
+  name: cert-manager-webhook-ovh
+  namespace: argocd
+
+spec:
+  project: default
+
+  source:
+    chart: cert-manager-webhook-ovh
+    repoURL: https://aureq.github.io/cert-manager-webhook-ovh/
+    targetRevision: 0.8.0
+
+  destination:
+    name: in-cluster
+    namespace: cert-manager
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+    helm:
+      releaseName: cert-manager-webhook-ovh-charts
+      valuesObject:
+        # See: https://github.com/aureq/cert-manager-webhook-ovh/blob/main/charts/cert-manager-webhook-ovh/values.yaml
+
+        # The `configVersion` is used to assist with breaking changes before an upgrade
+        # is applied.
+        # Each time breaking change are introduced, the internal `configVersion` is
+        # increased. If the user doesn't set the correct `configVersion` in their
+        # `values.yaml` indicating they have performed the required configuration
+        # changes, the new Chart version won't be installed preventing any outages.
+        # The latest `values.yaml` contains the correct `configVersion` but the line is
+        # commented. The latest `values.yaml` can be retrieved with the command below:
+        #    helm show values cert-manager-webhook-ovh-charts/cert-manager-webhook-ovh
+        configVersion: 0.0.2
+
+        # The GroupName here is used to identify your company or business unit that
+        # created this webhook.
+        # For example, this may be "acme.mycompany.example".
+        # This name will need to be referenced in each Issuer's `webhook` stanza to
+        # inform cert-manager of where to send ChallengePayload resources in order to
+        # solve the DNS01 challenge.
+        # This group name should be **unique**, hence using your own company's domain
+        # here is recommended.
+        groupName: acme.brot.epy.ovh
+
+        # The values below should match your cert-manager deployment.
+        # If not, you will get permissions errors.
+        certManager:
+          # namespace in which your cert-manager is deployed
+          namespace: cert-manager
+          # cert-manager serverAccount name (default: cert-manager)
+          serviceAccountName: cert-manager
+
+        # One or more issuers to create
+        issuers:
+          # Name of this issuer
+          - name: le-prod
+
+            # When true this issuer is created.
+            # This is disabled by default
+            create: true
+
+            # Type of issuer. Can either be ClusterIssuer or Issuer.
+            # If issuer is specified, the namespace is required.
+            # See for more information https://cert-manager.io/docs/concepts/issuer/
+            kind: ClusterIssuer
+
+            # If kind is issuer, then indicate the namespace in which this
+            # issuer should be deployed into.
+            namespace: default
+
+            # Follow CNAME records or not. 2 options:
+            # - None (default): Don't follow CNAME records
+            # - Follow: Follow CNAME records
+            # See https://cert-manager.io/docs/configuration/acme/dns01/#delegated-domains-for-dns01 for more information
+            cnameStrategy: None
+
+            # The acme server url. For Let's encrypt, you have 2 options:
+            # - for production (default): https://acme-v02.api.letsencrypt.org/directory
+            # - for staging: https://acme-staging-v02.api.letsencrypt.org/directory
+            acmeServerUrl: https://acme-v02.api.letsencrypt.org/directory
+
+            # email to use when registrering your account with Let's encrypt.
+            email: dlzke4f@epymail.com
+
+            # If the ACME server supports profiles, you can specify the profile name here.
+            # For more details, see https://cert-manager.io/docs/configuration/acme/#acme-certificate-profiles
+            # Available as of Cert Manager 1.18.0
+            # profile: classic # classic, tlsserver, shortlived
+
+            # Define the eab (external account binding) key using secretRef.
+            # This is optional and only required if you want to use.
+            # See https://cert-manager.io/docs/configuration/acme/#external-account-bindings for more information
+            # externalAccountBinding:
+            #   # eab key identifier.
+            #   keyID: keyID
+            #   # The secret reference to an existing eab key identifier.
+            #   keySecretRef:
+            #     # Name of the Kubernetes secret containing the eab hmac key
+            #     name: <secret-name>
+            #     # The key name in the secret above that holds the actual eab hmac key value
+            #     key: keySecret
+
+            # The endpoint name of the OVH API. It must be one of the following:
+            # ovh-eu, ovh-ca, kimsufi-eu, kimsufi-ca, soyoustart-eu, soyoustart-ca, runabove-ca
+            # See https://docs.certifytheweb.com/docs/dns/providers/ovh/ for more information
+            ovhEndpointName: ovh-eu
+
+            # Authentication method (possible values: application or oauth2)
+            ovhAuthenticationMethod: application
+            # define how the webhook should authenticate with the OVH API.
+            # Either set your credentials and the chart will create the necessary secret for you.
+            # Or provide the details of a secret already containing the OVH credentials.
+            # ovhAuthentication:
+
+            #   # the OVH OAuth 2 client ID. Leave empty if you are using an existing secret.
+            #   oauth2ClientID: ''
+            #   # the OVH OAuth 2 client secret. Leave empty if you are using an existing secret.
+            #   oauth2ClientSecret: ''
+
+            #   # the OVH application key. Leave emtpy if you are using an existing secret.
+            #   applicationKey: ''
+            #   # the OVH application secret. Leave emtpy if you are using an existing secret.
+            #   applicationSecret: ''
+            #   # Your OVH consumer key. Leave empty if you are using an existing secret.
+            #   applicationConsumerKey: ''
+
+            # If 'kind' is a ClusterIssuer, then the secret needs to be present
+            # in the same namespace as this deployment. If 'kind' is an Issuer,
+            # then the secret needs to be present in the same namespace as the Issuer.
+            ovhAuthenticationRef:
+              #   # The secret reference to an existing OVH OAuth 2 client ID.
+              #   oauth2ClientIDRef:
+
+              #     # Name of the Kubernetes secret containing the OVH OAuth 2 client ID
+              #     name: ovh-credentials
+              #     # The key name in the secret above that holds the actual OVH OAuth 2 client IDvalue
+              #     key: oauth2ClientID
+
+              #   # The secret reference to an existing OVH Auth 2 client secret.
+              #   oauth2ClientSecretRef:
+              #     # Name of the Kubernetes secret containing the OVH Auth 2 client secret
+              #     name: ovh-credentials
+              #     # The key name in the secret above that holds the actual OVH Auth 2 client secret value
+              #     key: oauth2ClientSecret
+
+              # The secret reference to an existing OVH application key.
+              applicationKeyRef:
+                # Name of the Kubernetes secret containing the OVH Application Key
+                name: ovh-credentials
+                # The key name in the secret above that holds the actual OVH application key value
+                key: applicationKey
+
+              # The secret reference to an existing OVH application secret.
+              applicationSecretRef:
+                # Name of the Kubernetes secret containing the OVH Application Secret
+                name: ovh-credentials
+                # The key name in the secret above that holds the actual OVH application secret value
+                key: applicationSecret
+
+              # The secret reference to an existing OVH consumer key
+              applicationConsumerKeyRef:
+                # Name of the Kubernetes secret containing the OVH consumer Key
+                name: ovh-credentials
+                # The key name in the secret above that holds the actual OVH consumer key value
+                key: applicationConsumerKey
+
+          # Name of this issuer
+          - name: le-staging
+
+            # When true this issuer is created.
+            # This is disabled by default
+            create: true
+
+            # Type of issuer. Can either be ClusterIssuer or Issuer.
+            # If issuer is specified, the the namespace is required.
+            # See for more information https://cert-manager.io/docs/concepts/issuer/
+            kind: ClusterIssuer
+
+            # If kind is issuer, then indicate the namespace in which this
+            # issuer should be deployed into.
+            namespace: default
+
+            # Follow CNAME records or not. 2 options:
+            # - None (default): Don't follow CNAME records
+            # - Follow: Follow CNAME records
+            # See https://cert-manager.io/docs/configuration/acme/dns01/#delegated-domains-for-dns01 for more information
+            cnameStrategy: None
+
+            # The acme server url. For Let's encrypt, you have 2 options:
+            # - for production (default): https://acme-v02.api.letsencrypt.org/directory
+            # - for staging: https://acme-staging-v02.api.letsencrypt.org/directory
+            acmeServerUrl: https://acme-staging-v02.api.letsencrypt.org/directory
+
+            # email to use when registering your account with Let's encrypt.
+            email: dlzke4f@epymail.com
+
+            # If the ACME server supports profiles, you can specify the profile name here.
+            # For more details, see https://cert-manager.io/docs/configuration/acme/#acme-certificate-profiles
+            # Run the command `curl -fsSL https://acme-v02.api.letsencrypt.org/directory` and inpsect the object `profiles`.
+            # Available as of Cert Manager 1.18.0
+            # profile: classic # classic, tlsserver, shortlived
+
+            # Define the eab (external account binding) key using secretRef.
+            # This is optional and only required if you want to use.
+            # See https://cert-manager.io/docs/configuration/acme/#external-account-bindings for more information
+            # externalAccountBinding:
+            #   # eab key identifier.
+            #   keyID: keyID
+            #   # The secret reference to an existing eab key identifier.
+            #   keySecretRef:
+            #     # Name of the Kubernetes secret containing the eab hmac key
+            #     name: <secret-name>
+            #     # The key name in the secret above that holds the actual eab hmac key value
+            #     key: keySecret
+
+            # The endpoint name of the OVH API. It must be one of the following:
+            # ovh-eu, ovh-ca, kimsufi-eu, kimsufi-ca, soyoustart-eu, soyoustart-ca, runabove-ca
+            # See https://docs.certifytheweb.com/docs/dns/providers/ovh/ for more information
+            ovhEndpointName: ovh-eu
+
+            # Authentication method (possible values: application or oauth2)
+            ovhAuthenticationMethod: application
+
+            # define how the webhook should authenticate with the OVH API.
+            # Either set your credentials and the chart will create the necessary secret for you.
+            # Or provide the details of a secret already containing the OVH credentials.
+            # ovhAuthentication:
+
+            #   # the OVH OAuth 2 client ID. Leave empty if you are using an existing secret.
+            #   oauth2ClientID: ''
+            #   # the OVH OAuth 2 client secret. Leave empty if you are using an existing secret.
+            #   oauth2ClientSecret: ''
+
+            #   # the OVH application key. Leave emtpy if you are using an existing secret.
+            #   applicationKey: ''
+            #   # the OVH application secret. Leave emtpy if you are using an existing secret.
+            #   applicationSecret: ''
+            #   # Your OVH consumer key. Leave empty if you are using an existing secret.
+            #   applicationConsumerKey: ''
+
+            # If 'kind' is a ClusterIssuer, then the secret needs to be present
+            # in the same namespace as this deployment. If 'kind' is an Issuer,
+            # then the secret needs to be present in the same namespace as the Issuer.
+            ovhAuthenticationRef:
+              #   # The secret reference to an existing OVH OAuth 2 client ID.
+              #   oauth2ClientIDRef:
+              #     # Name of the Kubernetes secret containing the OVH OAuth 2 client ID
+              #     name: ovh-credentials
+              #     # The key name in the secret above that holds the actual OVH OAuth 2 client IDvalue
+              #     key: oauth2ClientID
+
+              #   # The secret reference to an existing OVH Auth 2 client secret.
+              #   oauth2ClientSecretRef:
+              #     # Name of the Kubernetes secret containing the OVH Auth 2 client secret
+              #     name: ovh-credentials
+              #     # The key name in the secret above that holds the actual OVH Auth 2 client secret value
+              #     key: oauth2ClientSecret
+
+              # The secret reference to an existing OVH application key.
+              applicationKeyRef:
+                # Name of the Kubernetes secret containing the OVH Application Key
+                name: ovh-credentials
+                # The key name in the secret above that holds the actual OVH application key value
+                key: applicationKey
+
+              # The secret reference to an existing OVH application secret.
+              applicationSecretRef:
+                # Name of the Kubernetes secret containing the OVH Application Secret
+                name: ovh-credentials
+                # The key name in the secret above that holds the actual OVH application secret value
+                key: applicationSecret
+
+              # The secret reference to an existing OVH consumer key
+              applicationConsumerKeyRef:
+                # Name of the Kubernetes secret containing the OVH consumer Key
+                name: ovh-credentials
+                # The key name in the secret above that holds the actual OVH consumer key value
+                key: applicationConsumerKey
+
+        rbac:
+          # If the secret of the issuer is in a different namespace, change `Role` (default)
+          # to `ClusterRole` so the webhook is able to access this secret.
+          roleType: Role
+
+        # If enabled (default) the webhook will run as the specified user and group.
+        # Furthermore, the specified allowPrivilegeEscalation and readOnlyRootFilesystem are applied to the container.
+        # pod securityContext and container securityContext will be inserted as-is in their respective places so that
+        # it is possible to edit any supported field (e.g. capabilities, seccompProfile, privileged)
+        securityContext:
+          enabled: true
+          pod:
+            runAsUser: 1000
+            runAsGroup: 1000
+          container:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+
+        image:
+          repository: ghcr.io/aureq/cert-manager-webhook-ovh
+          # tag: ""
+          pullPolicy: IfNotPresent
+          # Use this set to assign a list of default pullSecrets
+          pullSecrets:
+            []
+            # - name: docker-registry-secret
+            # - name: internal-registry-secret
+
+        nameOverride: ""
+        fullnameOverride: ""
+
+        # Use this field to add environment variables relevant to this webhook.
+        # These fields will be passed on to the container when Chart is deployed.
+        environment:
+          # Use these variables to configure the HTTP_PROXY environment variables
+          # HTTP_PROXY: "http://proxy:8080"
+          # HTTPS_PROXY: "http://proxy:8080"
+          # NO_PROXY: "127.0.0.1,localhost,10.0.0.0/8"
+
+        # number of replicas in this deployment
+        replicas: 1
+
+        service:
+          type: ClusterIP
+          port: 443
+
+        # Specifies if the webhook should be started in hostNetwork mode.
+        #
+        # Required for use in some managed kubernetes clusters (such as AWS EKS) with custom
+        # CNI (such as calico), because control-plane managed by AWS cannot communicate
+        # with pods' IP CIDR and admission webhooks are not working
+        hostNetwork: false
+
+        # The port used by the application to expose the service.
+        # It may be useful to change it if the hostNetwork mode is activated to use an available port.
+        port: 8443
+
+        resources:
+          {}
+          # We usually recommend not to specify default resources and to leave this as a conscious
+          # choice for the user. This also increases chances charts run on environments with little
+          # resources, such as Minikube. If you do want to specify resources, uncomment the following
+          # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+          # requests:
+          #   cpu: 100m
+          #   memory: 64Mi
+          # limits:
+          #   cpu: 200m
+          #   memory: 96Mi
+
+        # see https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+        nodeSelector: {}
+
+        # see https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+        tolerations: []
+
+        # see https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/
+        affinity: {}
+
+        # see https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+        # add annotations to the Deployment
+        annotations: {}
+
+        # see https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+        # add annotations to the Pod
+        podAnnotations: {}
+
+        # see https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+        # add labels to the Pod
+        podLabels: {}
+
+        # Create dynamic manifests via values.
+        #
+        # For example:
+        # extraObjects:
+        #   - |
+        #     apiVersion: v1
+        #     kind: ConfigMap
+        #     metadata:
+        #       name: '{{ template "cert-manager.fullname" . }}-extra-configmap'
+        extraObjects: []
