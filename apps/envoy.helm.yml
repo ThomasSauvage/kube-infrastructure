@@ -1,11 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
+
 metadata:
   name: envoy-gateway
   namespace: argocd
+
 spec:
   project: default
+
   source:
+    chart: gateway-helm
+    path: gateway-helm
+    repoURL: docker.io/envoyproxy
+    targetRevision: v1.6.2
+
     # see: https://gateway.envoyproxy.io/docs/install/gateway-helm-api/
     helm:
       valuesObject:
@@ -15,13 +23,11 @@ spec:
               limits:
                 cpu: 700m
                 memory: 256Mi
-    chart: gateway-helm
-    path: gateway-helm
-    repoURL: docker.io/envoyproxy
-    targetRevision: v1.6.2
+
   destination:
     namespace: envoy-gateway-system
     name: in-cluster
+
   syncPolicy:
     syncOptions:
       - CreateNamespace=true

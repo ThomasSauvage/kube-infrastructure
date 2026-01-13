@@ -6,4 +6,6 @@
 
 # Those are here for security reasons, to avoid accidental commits
 # but shouldn't be used as file names
-*secret* filter=git-crypt diff=git-crypt
+*.secret.k8s.yml filter=git-crypt diff=git-crypt
+*.secret.yml filter=git-crypt diff=git-crypt
+*.secret filter=git-crypt diff=git-crypt

@@ -17,6 +17,7 @@ spec:
     - name: http
       protocol: HTTP
       port: 80
+      # All namespaces are allowed to use this Gateway
       allowedRoutes:
         namespaces:
           from: All
