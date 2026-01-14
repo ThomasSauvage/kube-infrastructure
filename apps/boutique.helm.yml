@@ -21,6 +21,8 @@ spec:
       - ServerSideApply=true
 
   source:
-    chart: onlineboutique
-    repoURL: https://us-docker.pkg.dev/online-boutique-ci/charts
-    targetRevision: 0.10.4
+    repoURL: https://github.com/GoogleCloudPlatform/microservices-demo.git
+    targetRevision: main
+    path: helm-chart
+    helm:
+      releaseName: google-online-boutique
