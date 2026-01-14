@@ -22,5 +22,5 @@ spec:
 
   source:
     chart: onlineboutique
-    repoURL: https://us-docker.pkg.dev/online-boutique-ci/
+    repoURL: https://us-docker.pkg.dev/online-boutique-ci/charts/onlineboutique
     targetRevision: 0.10.4
