@@ -11,6 +11,22 @@ export KUBECONFIG=$(pwd)/kubeconfig.secrets.yml
 kubectl get nodes
 ```
 
+## Cluster features
+
+- Kubernetes VMs over Proxmox with [Talos](https://www.talos.dev/)
+- GitOps with [ArgoCD](https://argo-cd.readthedocs.io/)
+- Load balancer L2 advertisement with [MetalLB](https://metallb.io/)
+- Gateway API with [Envoy Gateway](https://gateway.envoyproxy.io/)
+  - HTTPS support
+  - HTTP to HTTPS redirection support
+  - HTTP3 / QUIC support
+- Certificate management with [Cert manager](https://cert-manager.io/)
+- Certificate autorenewal using OVH DNS challenges with [Cert manager webhook OVH](https://aureq.github.io/cert-manager-webhook-ovh/)
+- Secret storage with [Git crypt](https://github.com/AGWA/git-crypt)
+- Deployments
+  - [Google online boutique](https://github.com/GoogleCloudPlatform/microservices-demo)
+  - [whoami](https://github.com/traefik/whoami)
+
 ## Ideas of things to do
 
 - SAST
