@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+
+metadata:
+  name: google-online-boutique
+  namespace: argocd
+
+spec:
+  project: default
+
+  destination:
+    name: in-cluster
+    namespace: google-online-boutique
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
+  source:
+    chart: onlineboutique
+    repoURL: https://us-docker.pkg.dev/online-boutique-ci/
+    targetRevision: 0.10.4
