@@ -4,7 +4,7 @@ machine:
         interfaces:
             - interface: eth0
               addresses:
-                - 192.168.1.135/25
+                - 192.168.1.106/24
                 - 2a01:e0a:a67:5151::106/64
               routes:
                 - network: 0.0.0.0/0
