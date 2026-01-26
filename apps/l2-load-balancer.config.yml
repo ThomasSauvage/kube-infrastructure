@@ -1,0 +1,52 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "loadbalancer-ippool"
+spec:
+  blocks:
+    # We could have more, but we just need one for Ingress
+    - cidr: "192.168.1.150/32"
+    - cidr: "192.168.1.151/32"
+    - cidr: "2a01:e0a:a67:5151:c0:ffee::/96"
+
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: "l2-announcement-policy"
+spec:
+  loadBalancerIPs: true
+  interfaces:
+    - "^eth[0-9]+"
+#  nodeSelector: # Could be used to use L2 announcement only on specific nodes
+#    matchLabels:
+#     (...)
+
+---
+# The load balancer for the ingress is created by Cilium (at `helm install`)
+# Here, is the version created by `helm template`
+# Modified to add IPv6 support
+# I think this is a rough hack
+apiVersion: v1
+kind: Service
+metadata:
+  name: cilium-ingress
+  namespace: kube-system
+  labels:
+    cilium.io/ingress: "true"
+    app.kubernetes.io/part-of: cilium
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+    - name: https
+      port: 443
+      protocol: TCP
+  type: LoadBalancer
+  externalTrafficPolicy: Cluster
+  # Added for Dual Stack
+  ipFamilyPolicy: PreferDualStack
+  ipFamilies:
+    - IPv4
+    - IPv6

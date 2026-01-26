@@ -234,10 +234,10 @@ cluster:
         serviceSubnets:
             - 10.96.0.0/12
             - fd02::/108
-
-        # # The CNI used.
-        # cni:
-        #     name: custom # Name of CNI to use.
+        
+        # Disabled as we use Cilium
+        cni:
+            name: none # Name of CNI to use.
         #     # URLs containing manifests to apply for the CNI.
         #     urls:
         #         - https://docs.projectcalico.org/archive/v3.20/manifests/canal.yaml
@@ -347,9 +347,9 @@ cluster:
     #         feature-gates: ServerSideApply=true
 
     # # Kube-proxy server-specific configuration options
-    # proxy:
-    #     disabled: false # Disable kube-proxy deployment on cluster bootstrap.
-    #     image: registry.k8s.io/kube-proxy:v1.35.0 # The container image used in the kube-proxy manifest.
+    proxy:
+        disabled: true # Disable kube-proxy deployment on cluster bootstrap.
+    #     image: registry.k8s.io/kube-proxy:v1.34.1 # The container image used in the kube-proxy manifest.
     #     mode: ipvs # proxy mode of kube-proxy.
     #     # Extra arguments to supply to kube-proxy.
     #     extraArgs:
