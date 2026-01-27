@@ -29,11 +29,14 @@ brew install argocd
 
 argocd admin initial-password -n argocd
 argocd login localhost:9080
+# username: admin
+# password: <initial password>
 #  <y> (insecure)
+
+argocd account update-password
 #  <initial password>
 #  <new password>
 #  <confirm new password>
-argocd account update-password
 ```
 
 ### Create a Github fine-grained personal access token

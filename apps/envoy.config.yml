@@ -102,3 +102,9 @@ metadata:
 
 spec:
   ipFamily: DualStack # Supports: IPv4, IPv6, or DualStack
+  # Fix to make Envoy Gateway work with Cilium L2 advertisement
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        externalTrafficPolicy: Cluster

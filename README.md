@@ -13,7 +13,7 @@ cf. [Talos-over-Proxmox configuration](./COOKBOOK.md)
 - Install [Brew](https://brew.sh/)
 
 ```sh
-brew install kubectl helm cilium-cli siderolabs/tap/talosctl
+brew install kubectl helm git-crypt argocd cilium-cli siderolabs/tap/talosctl
 ```
 
 ## Usage
