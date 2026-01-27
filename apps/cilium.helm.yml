@@ -1,0 +1,111 @@
+# This ArgoCD Application deploys Cilium using the Helm chart.
+# Note that Cilium must be installed BEFORE ArgoCD is installed,
+# so Cilium is first installed in bootstrap/cilium.helm.sh
+#
+# Then, this Application ensures that Cilium is managed by ArgoCD,
+# and that any configuration changes are applied automatically.
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+
+metadata:
+  name: cilium
+  namespace: argocd
+  annotations:
+    # Cilium needs to be installed very early
+    argocd.argoproj.io/sync-wave: "-10"
+
+spec:
+  project: default
+
+  source:
+    chart: cilium
+    repoURL: https://helm.cilium.io/
+    targetRevision: 1.19.0-rc.0
+
+    helm:
+      releaseName: cilium
+      valuesObject:
+        # Doc: https://docs.cilium.io/en/stable/helm-reference/
+
+        ipam:
+          mode: kubernetes
+
+        ipv4:
+          enabled: true
+        ipv6:
+          enabled: true
+
+        prometheus:
+          enabled: true
+
+        operator:
+          prometheus:
+            enabled: true
+
+          # Restart Cilium pods when Cilium config changes
+          rollOutPods: true
+
+        # Restart Cilium pods when Cilium config changes
+        rollOutCiliumPods: true
+
+        hubble:
+          enabled: true
+          ui:
+            # Restart Cilium pods when Cilium config changes
+            rollOutPods: true
+          metrics:
+            enableOpenMetrics: true
+            enabled:
+              - dns
+              - drop
+              - tcp
+              - flow
+              - port-distribution
+              - icmp
+              - "httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction"
+
+        # L2 Load balancer
+        l2announcements:
+          enabled: true
+
+        kubeProxyReplacement: true
+
+        # Recommended by Talos
+        securityContext:
+          capabilities:
+            ciliumAgent:
+              - CHOWN
+              - KILL
+              - NET_ADMIN
+              - NET_RAW
+              - IPC_LOCK
+              - SYS_ADMIN
+              - SYS_RESOURCE
+              - DAC_OVERRIDE
+              - FOWNER
+              - SETGID
+              - SETUID
+            cleanCiliumState:
+              - NET_ADMIN
+              - SYS_ADMIN
+              - SYS_RESOURCE
+
+        cgroup:
+          autoMount:
+            enabled: false
+          hostRoot: /sys/fs/cgroup
+
+        k8sServiceHost: localhost
+        k8sServicePort: 7445
+
+  destination:
+    name: in-cluster
+    namespace: kube-system
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true

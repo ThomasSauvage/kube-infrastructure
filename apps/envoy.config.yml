@@ -82,3 +82,18 @@ spec:
       name: envoy-gateway
 
   http3: {}
+
+---
+# Activate dual-stack IP family
+# https://gateway.envoyproxy.io/docs/tasks/operations/customize-envoyproxy/#customize-envoyproxy-ip-family
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+
+metadata:
+  name: envoy-proxy-config
+  namespace: envoy-gateway-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+
+spec:
+  ipFamily: DualStack # Supports: IPv4, IPv6, or DualStack
