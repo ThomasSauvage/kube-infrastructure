@@ -8,6 +8,14 @@ cf. [Talos-over-Proxmox configuration](./COOKBOOK.md)
 - Then, bootstrap the cluster. See [bootstrap/COOKBOOK.md](bootstrap/COOKBOOK.md)
 - Apps in `apps/` should now be deployed.
 
+## Install CLIs
+
+- Install [Brew](https://brew.sh/)
+
+```sh
+brew install kubectl helm cilium-cli siderolabs/tap/talosctl
+```
+
 ## Usage
 
 ```sh

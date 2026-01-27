@@ -5,7 +5,40 @@ Reference :
 - https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/virtualized-platforms/proxmox
 - https://github.com/ThomasSauvage/CSC_5GI02_TP/blob/feat-add-talos/cluster_config/talos_config/Create%20new%20Proxmox%20VM.md
 
-## Setup Proxmox VMs
+## Setting up the Talos cluster
+
+The IP addresses might vary. Check the dashboard to have the actual IPs.
+
+```sh
+talosctl reset --reboot --graceful=false --nodes "192.168.1.105,192.168.1.106,192.168.1.107"
+
+talosctl apply-config --nodes 192.168.1.105 \
+        --file initial-config/controlplane.yml \
+        --config-patch @initial-config/cluster.secrets.yml \
+        --config-patch @initial-config/controlplane.secrets.yml \
+        --config-patch @patches/controlplane1.yml \
+        --insecure
+
+talosctl apply-config --nodes 192.168.1.106 \
+        --file initial-config/worker.yml \
+        --config-patch @initial-config/cluster.secrets.yml \
+        --config-patch @patches/worker1.yml \
+        --insecure
+
+talosctl apply-config --nodes 192.168.1.107 \
+        --file initial-config/worker.yml \
+        --config-patch @initial-config/cluster.secrets.yml \
+        --config-patch @patches/worker2.yml \
+        --insecure
+
+talosctl bootstrap
+```
+
+## Creating the config in `talos/`
+
+This part is **not required** to create the cluster. This only describes how we created the configuration in this folder.
+
+### Setup Proxmox VMs
 
 1. Generate Talos ISO image : https://factory.talos.dev/
 
@@ -44,7 +77,7 @@ Reference :
 - Network
   - Bridge : kubenet
 
-## Talos enrollment
+### Talos enrollment
 
 > Temporary DHCP IP address mapping:
 >
@@ -89,7 +122,7 @@ export KUBECONFIG="kubeconfig"
 kubectl get nodes
 ```
 
-## Future updates
+### Future updates
 
 > Run with `--dry-run` first to verify changes before applying
 
@@ -108,31 +141,4 @@ talosctl apply-config --nodes 2a01:e0a:a67:5151::107 \
     --file initial-config/worker.yml \
     --config-patch @initial-config/cluster.secrets.yml \
     --config-patch @patches/worker2.yml
-```
-
-## Resetting Talos VMs
-
-```sh
-talosctl reset --reboot --graceful=false --nodes "192.168.1.105,192.168.1.106,192.168.1.107"
-
-talosctl apply-config --nodes 192.168.1.105 \
-        --file initial-config/controlplane.yml \
-        --config-patch @initial-config/cluster.secrets.yml \
-        --config-patch @initial-config/controlplane.secrets.yml \
-        --config-patch @patches/controlplane1.yml \
-        --insecure
-
-talosctl apply-config --nodes 192.168.1.106 \
-        --file initial-config/worker.yml \
-        --config-patch @initial-config/cluster.secrets.yml \
-        --config-patch @patches/worker1.yml \
-        --insecure
-
-talosctl apply-config --nodes 192.168.1.107 \
-        --file initial-config/worker.yml \
-        --config-patch @initial-config/cluster.secrets.yml \
-        --config-patch @patches/worker2.yml \
-        --insecure
-
-talosctl bootstrap
 ```
