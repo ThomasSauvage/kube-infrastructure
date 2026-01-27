@@ -4,6 +4,8 @@ kind: Application
 metadata:
   name: cert-manager-webhook-ovh
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"
 
 spec:
   project: default
@@ -309,8 +311,7 @@ spec:
           # tag: ""
           pullPolicy: IfNotPresent
           # Use this set to assign a list of default pullSecrets
-          pullSecrets:
-            []
+          pullSecrets: []
             # - name: docker-registry-secret
             # - name: internal-registry-secret
 
@@ -343,8 +344,7 @@ spec:
         # It may be useful to change it if the hostNetwork mode is activated to use an available port.
         port: 8443
 
-        resources:
-          {}
+        resources: {}
           # We usually recommend not to specify default resources and to leave this as a conscious
           # choice for the user. This also increases chances charts run on environments with little
           # resources, such as Minikube. If you do want to specify resources, uncomment the following
