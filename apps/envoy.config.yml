@@ -2,6 +2,9 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
 metadata:
   name: envoy-gateway
+  annotations:
+    # Sync second
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
   controllerName: gateway.envoyproxy.io/gatewayclass-controller
 
@@ -12,6 +15,9 @@ kind: Gateway
 metadata:
   name: envoy-gateway
   namespace: envoy-gateway-system
+  annotations:
+    # Sync second
+    argocd.argoproj.io/sync-wave: "-1"
 
 spec:
   gatewayClassName: envoy-gateway
