@@ -26,8 +26,10 @@ kubectl get nodes
 ## Cluster features
 
 - Kubernetes VMs over Proxmox with [Talos](https://www.talos.dev/)
+- Container Network Interface (CNI) with [Cilium](https://cilium.io/)
+- Fully dual-stack (IPv4 and IPv6) cluster
 - GitOps with [ArgoCD](https://argo-cd.readthedocs.io/)
-- Load balancer L2 advertisement with [MetalLB](https://metallb.io/)
+- Load balancer L2 advertisement with [Cilium](https://docs.cilium.io/en/latest/network/l2-announcements/)
 - Gateway API with [Envoy Gateway](https://gateway.envoyproxy.io/)
   - HTTPS support
   - HTTP to HTTPS redirection support
