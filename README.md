@@ -4,6 +4,10 @@
 
 cf. [Talos-over-Proxmox configuration](./COOKBOOK.md)
 
+- First, setup the cluster VMs with Talos. See [talos/COOKBOOK.md](talos/COOKBOOK.md).
+- Then, bootstrap the cluster. See [bootstrap/COOKBOOK.md](bootstrap/COOKBOOK.md)
+- Apps in `apps/` should now be deployed.
+
 ## Usage
 
 ```sh
@@ -30,7 +34,6 @@ kubectl get nodes
 ## Ideas of things to do
 
 - SAST
-
   - SonarQube: https://github.com/SonarSource/sonarqube
   - Semgrep: https://github.com/semgrep/semgrep
   - Bearer: https://github.com/Bearer/bearer
@@ -39,12 +42,10 @@ kubectl get nodes
   - Bandit (python), Bearer(javascript,…), Mate (c/c++), blackslash, …
 
 - Secret detection
-
   - Gitleaks
   - TruffleHog
 
 - SCA & Image Vulnerability Scanner
-
   - Trivy: https://trivy.dev/ (includes also posture management)
   - Grype: https://github.com/anchore/grype (vulnerability for containers)
   - Syft: https://github.com/anchore/syft (SBOM for containers)
@@ -52,12 +53,10 @@ kubectl get nodes
   - See also: https://owasp.org/www-community/Free_for_Open_Source_Application_Security_Tools
 
 - Cloud Security Posture Management
-
   - Trivy (IaC, terraform, K8s)
   - Kubescore, Kubescape (K8s)
 
 - Dynamic application security testing
-
   - Zed Attack Proxy (web app). https://www.zaproxy.org
   - Nikto
   - Many others…
@@ -65,6 +64,5 @@ kubectl get nodes
     ov-file)
 
 - Telemetry
-
   - Collectors : Prometheus, Cilium, Tetragon, … or offered as a service by cloud providers
   - Standard format (OpenTelemetry)

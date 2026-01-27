@@ -109,3 +109,30 @@ talosctl apply-config --nodes 2a01:e0a:a67:5151::107 \
     --config-patch @initial-config/cluster.secrets.yml \
     --config-patch @patches/worker2.yml
 ```
+
+## Resetting Talos VMs
+
+```sh
+talosctl reset --reboot --graceful=false --nodes "192.168.1.105,192.168.1.106,192.168.1.107"
+
+talosctl apply-config --nodes 192.168.1.105 \
+        --file initial-config/controlplane.yml \
+        --config-patch @initial-config/cluster.secrets.yml \
+        --config-patch @initial-config/controlplane.secrets.yml \
+        --config-patch @patches/controlplane1.yml \
+        --insecure
+
+talosctl apply-config --nodes 192.168.1.106 \
+        --file initial-config/worker.yml \
+        --config-patch @initial-config/cluster.secrets.yml \
+        --config-patch @patches/worker1.yml \
+        --insecure
+
+talosctl apply-config --nodes 192.168.1.107 \
+        --file initial-config/worker.yml \
+        --config-patch @initial-config/cluster.secrets.yml \
+        --config-patch @patches/worker2.yml \
+        --insecure
+
+talosctl bootstrap
+```
