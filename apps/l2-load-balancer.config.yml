@@ -21,32 +21,3 @@ spec:
 #  nodeSelector: # Could be used to use L2 announcement only on specific nodes
 #    matchLabels:
 #     (...)
-
----
-# The load balancer for the ingress is created by Cilium (at `helm install`)
-# Here, is the version created by `helm template`
-# Modified to add IPv6 support
-# I think this is a rough hack
-apiVersion: v1
-kind: Service
-metadata:
-  name: cilium-ingress
-  namespace: kube-system
-  labels:
-    cilium.io/ingress: "true"
-    app.kubernetes.io/part-of: cilium
-spec:
-  ports:
-    - name: http
-      port: 80
-      protocol: TCP
-    - name: https
-      port: 443
-      protocol: TCP
-  type: LoadBalancer
-  externalTrafficPolicy: Cluster
-  # Added for Dual Stack
-  ipFamilyPolicy: PreferDualStack
-  ipFamilies:
-    - IPv4
-    - IPv6
