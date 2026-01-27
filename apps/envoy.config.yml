@@ -3,7 +3,6 @@ kind: GatewayClass
 metadata:
   name: envoy-gateway
   annotations:
-    # Sync second
     argocd.argoproj.io/sync-wave: "-1"
 spec:
   controllerName: gateway.envoyproxy.io/gatewayclass-controller
@@ -16,7 +15,6 @@ metadata:
   name: envoy-gateway
   namespace: envoy-gateway-system
   annotations:
-    # Sync second
     argocd.argoproj.io/sync-wave: "-1"
 
 spec:

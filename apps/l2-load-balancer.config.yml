@@ -1,7 +1,11 @@
 apiVersion: "cilium.io/v2"
 kind: CiliumLoadBalancerIPPool
+
 metadata:
   name: "loadbalancer-ippool"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+
 spec:
   blocks:
     # We could have more, but we just need one for Ingress
@@ -12,8 +16,12 @@ spec:
 ---
 apiVersion: "cilium.io/v2alpha1"
 kind: CiliumL2AnnouncementPolicy
+
 metadata:
   name: "l2-announcement-policy"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+
 spec:
   loadBalancerIPs: true
   interfaces:
