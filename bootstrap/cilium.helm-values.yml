@@ -1,3 +1,8 @@
+# This file contains custom Helm values for Cilium installation.
+#
+# It is ONLY USED DURING THE BOOTSTRAP PHASE
+# For the ArgoCD-managed installation, see apps/cilium.helm.yml
+#
 # Doc: https://docs.cilium.io/en/stable/helm-reference/
 
 # image:
@@ -78,3 +83,6 @@ cgroup:
 
 k8sServiceHost: localhost
 k8sServicePort: 7445
+
+# Required for Envoy Gateway integration
+l7proxy: true
