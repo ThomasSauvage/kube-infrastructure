@@ -1,9 +1,9 @@
-##Secret management
+# Secret management
 
 Secrets are managed outside of ArgoCD, and applied manually using the following command:
 
 ```sh
-kubectl apply -f "bootstrap/*.secrets.yml"
+kubectl apply -f "*.secrets.yml"
 ```
 
 ## OVH secret generation
