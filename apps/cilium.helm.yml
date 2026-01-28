@@ -102,6 +102,9 @@ spec:
         # Required for Envoy Gateway integration
         l7proxy: true
 
+        envoy:
+          enabled: false
+
   destination:
     name: in-cluster
     namespace: kube-system

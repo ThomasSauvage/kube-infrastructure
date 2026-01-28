@@ -86,3 +86,6 @@ k8sServicePort: 7445
 
 # Required for Envoy Gateway integration
 l7proxy: true
+
+envoy:
+  enabled: false
