@@ -25,6 +25,7 @@ spec:
               limits:
                 cpu: 700m
                 memory: 256Mi
+          replicas: 2
 
   destination:
     namespace: envoy-gateway-system
