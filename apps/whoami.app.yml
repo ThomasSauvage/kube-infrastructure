@@ -23,7 +23,8 @@ spec:
     metadata:
       labels:
         app: whoami
-        gateway-accessible: "true"
+        # Allows communication with Envoy Gateway
+        security-gateway-accessible: "true"
     spec:
       containers:
         - name: whoami

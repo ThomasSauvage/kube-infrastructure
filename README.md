@@ -37,6 +37,7 @@ kubectl get pods -A
   - HTTPS support
   - HTTP to HTTPS redirection support
   - HTTP3 / QUIC support
+- Network policies with [Cilium Network Policies](https://docs.cilium.io/en/stable/security/policy/)
 - Certificate management with [Cert manager](https://cert-manager.io/)
 - Certificate autorenewal using OVH DNS challenges with [Cert manager webhook OVH](https://aureq.github.io/cert-manager-webhook-ovh/)
 - Secret storage with [Git crypt](https://github.com/AGWA/git-crypt)
@@ -98,4 +99,10 @@ kubectl run curler --image=curlimages/curl:latest --restart=Never -- sleep 1d
 kubectl exec -it curler -- ping 1.1.1.1
 
 kubectl delete pod curler
+```
+
+- You can, for exemple, try security labels on the `curler` pod (it can take around 30s to be effective):
+
+```sh
+kubectl label pod curler security-gateway-accessible=true
 ```

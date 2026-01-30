@@ -105,8 +105,9 @@ spec:
         envoy:
           enabled: false
 
-        # Enforce network policies on all pods
-        policyEnforcementMode: always
+        # This is the default. policyEnforcementMode: always would be
+        # safer, but breaks everything
+        policyEnforcementMode: default
 
   destination:
     name: in-cluster
