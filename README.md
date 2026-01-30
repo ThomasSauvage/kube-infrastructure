@@ -1,14 +1,8 @@
 # BRoT: BR over Télécom
 
-## Installation
+## Usage
 
-cf. [Talos-over-Proxmox configuration](./COOKBOOK.md)
-
-- First, setup the cluster VMs with Talos. See [talos/COOKBOOK.md](talos/COOKBOOK.md).
-- Then, bootstrap the cluster. See [bootstrap/COOKBOOK.md](bootstrap/COOKBOOK.md)
-- Apps in `apps/` should now be deployed.
-
-## Install CLIs
+### Prerequisites
 
 - Install [Brew](https://brew.sh/)
 
@@ -16,11 +10,20 @@ cf. [Talos-over-Proxmox configuration](./COOKBOOK.md)
 brew install kubectl helm git-crypt argocd cilium-cli siderolabs/tap/talosctl
 ```
 
-## Usage
+- Merge this cluster's kubeconfig to your local kubeconfig. This should not delete any existing contexts, but to be safe, this command first creates a backup of your existing kubeconfig.
 
 ```sh
-export KUBECONFIG=$(pwd)/kubeconfig.secrets.yml
-kubectl get nodes
+cp ~/.kube/config ~/.kube/config.bkp
+KUBECONFIG=~/.kube/config:$(pwd)/kubeconfig.secrets.yml kubectl config view --flatten > ~/.kube/config_merged
+mv ~/.kube/config_merged ~/.kube/config
+```
+
+### Accessing the cluster
+
+```sh
+kubectl config use-context admin@kube-brot
+
+kubectl get pods -A
 ```
 
 ## Cluster features
@@ -40,6 +43,14 @@ kubectl get nodes
 - Deployments
   - [Google online boutique](https://github.com/GoogleCloudPlatform/microservices-demo)
   - [whoami](https://github.com/traefik/whoami)
+
+## Creating the cluster
+
+cf. [Talos-over-Proxmox configuration](./COOKBOOK.md)
+
+- First, setup the cluster VMs with Talos. See [talos/COOKBOOK.md](talos/COOKBOOK.md).
+- Then, bootstrap the cluster. See [bootstrap/COOKBOOK.md](bootstrap/COOKBOOK.md)
+- Apps in `apps/` should now be deployed.
 
 ## Ideas of things to do
 
@@ -76,3 +87,15 @@ kubectl get nodes
 - Telemetry
   - Collectors : Prometheus, Cilium, Tetragon, … or offered as a service by cloud providers
   - Standard format (OpenTelemetry)
+
+## Debugging and pen-testing
+
+- A pod to try to `curl`. An other interesting tool is `busybox:1.28`.
+
+```sh
+kubectl run curler --image=curlimages/curl:latest --restart=Never -- sleep 1d
+
+kubectl exec -it curler -- ping 1.1.1.1
+
+kubectl delete pod curler
+```
