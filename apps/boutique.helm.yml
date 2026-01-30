@@ -26,3 +26,7 @@ spec:
     path: helm-chart
     helm:
       releaseName: google-online-boutique
+      valuesObject:
+        # see: https://github.com/GoogleCloudPlatform/microservices-demo/blob/main/helm-chart/values.yaml
+        networkPolicies:
+          create: true
