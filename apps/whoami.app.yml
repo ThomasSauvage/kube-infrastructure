@@ -26,9 +26,22 @@ spec:
         # Allows communication with Envoy Gateway
         security-gateway-accessible: "true"
     spec:
+      # Run the container as a non-root user for better security
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: whoami
           image: traefik/whoami
+          # Add additional security settings to the container
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
           ports:
             - name: web
               containerPort: 80
