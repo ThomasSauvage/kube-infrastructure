@@ -1,0 +1,187 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+
+metadata:
+  name: allow-dns-cluster-wide
+
+spec:
+  description: "Allow all pods to perform DNS lookups"
+  endpointSelector: {}
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"
+
+---
+# Allow all pods to reach services within the cluster
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+
+metadata:
+  name: allow-all-egress-to-cluster
+
+spec:
+  description: "Allow all pods to reach other pods in the cluster"
+  endpointSelector: {}
+  egress:
+    - toEntities:
+        - cluster
+
+---
+# Allow kube-system pods to access the API server and communicate freely
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+
+metadata:
+  name: allow-kube-system-egress
+
+spec:
+  description: "Allow kube-system pods full egress access"
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: kube-system
+  egress:
+    - toEntities:
+        - kube-apiserver
+        - host
+        - world
+        - cluster
+  egressDeny: []
+
+---
+# Allow ingress to kube-system pods from anywhere in the cluster
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+
+metadata:
+  name: allow-kube-system-ingress
+
+spec:
+  description: "Allow ingress to kube-system pods from cluster"
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: kube-system
+  ingress:
+    - fromEntities:
+        - cluster
+        - host
+
+---
+# Network policies for Envoy Gateway
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+
+metadata:
+  name: envoy-gateway-allow-ingress
+  namespace: envoy-gateway-system
+
+spec:
+  description: "Allow ingress traffic to Envoy Gateway from the world"
+  endpointSelector:
+    matchLabels:
+      gateway.envoyproxy.io/owning-gateway-name: envoy-gateway
+  ingress:
+    - fromEntities:
+        - world
+        - cluster
+        - host
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+            - port: "443"
+              protocol: UDP
+            - port: "19003"
+              protocol: TCP
+            - port: "19001"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            gateway-accessible: "true"
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: envoy-gateway-system
+            control-plane: envoy-gateway
+      toPorts:
+        - ports:
+            - port: "18000"
+              protocol: TCP
+            - port: "18001"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+
+metadata:
+  name: allow-envoy-gateway-to-api-server
+
+spec:
+  description: "Allow Envoy Gateway to reach Kubernetes API server"
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: envoy-gateway-system
+  egress:
+    - toEntities:
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "6443"
+              protocol: TCP
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: envoy-gateway-system
+      toPorts:
+        - ports:
+            - port: "18000"
+              protocol: TCP
+            - port: "18001"
+              protocol: TCP
+            - port: "18002"
+              protocol: TCP
+            - port: "19001"
+              protocol: TCP
+            - port: "9443"
+              protocol: TCP
+
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+
+metadata:
+  name: allow-envoy-to-gateway-accessible
+
+spec:
+  description: "Allow Envoy Gateway to reach pods labeled gateway-accessible"
+  endpointSelector:
+    matchLabels:
+      gateway-accessible: "true"
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: envoy-gateway-system
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP

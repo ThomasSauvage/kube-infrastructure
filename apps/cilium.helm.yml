@@ -105,6 +105,9 @@ spec:
         envoy:
           enabled: false
 
+        # Enforce network policies on all pods
+        policyEnforcementMode: always
+
   destination:
     name: in-cluster
     namespace: kube-system
