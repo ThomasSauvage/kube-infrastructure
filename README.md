@@ -44,6 +44,7 @@ kubectl get pods -A
 - Deployments
   - [Google online boutique](https://github.com/GoogleCloudPlatform/microservices-demo)
   - [whoami](https://github.com/traefik/whoami)
+  - [BRoT app](https://github.com/ThomasSauvage/brot-app) with a CI/CD pipeline building and pushing container images to GHCR
 
 ## Creating the cluster
 
