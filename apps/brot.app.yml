@@ -36,6 +36,8 @@ spec:
       containers:
         - name: brot-app
           image: ghcr.io/thomassauvage/brot-app:latest
+          imagePullSecrets:
+            - name: brot-app-registry-credentials
           # Add additional security settings to the container
           securityContext:
             allowPrivilegeEscalation: false
