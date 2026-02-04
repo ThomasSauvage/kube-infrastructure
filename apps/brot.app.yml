@@ -33,18 +33,20 @@ spec:
         runAsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
+      imagePullSecrets:
+        - name: brot-app-registry-credentials
       containers:
         - name: brot-app
           image: ghcr.io/thomassauvage/brot-app:latest
-          imagePullSecrets:
-            - name: brot-app-registry-credentials
           # Add additional security settings to the container
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
               drop:
                 - ALL
-            readOnlyRootFilesystem: true
+              add:
+                - NET_BIND_SERVICE
+            readOnlyRootFilesystem: false
           ports:
             - name: web
               containerPort: 80
