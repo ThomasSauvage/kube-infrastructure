@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: Namespace
+
+metadata:
+  name: brot-app
+
+---
+kind: Deployment
+apiVersion: apps/v1
+
+metadata:
+  name: brot-app
+  labels:
+    app: brot-app
+  namespace: brot-app
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: brot-app
+  template:
+    metadata:
+      labels:
+        app: brot-app
+        # Allows communication with Envoy Gateway
+        security-gateway-accessible: "true"
+    spec:
+      # Run the container as a non-root user for better security
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: brot-app
+          image: ghcr.io/thomassauvage/brot-app:latest
+          # Add additional security settings to the container
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          ports:
+            - name: web
+              containerPort: 80
+          resources:
+            requests:
+              cpu: "300m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: brot-app
+  namespace: brot-app
+
+spec:
+  selector:
+    app: brot-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+
+metadata:
+  name: brot-app
+  namespace: brot-app
+
+spec:
+  parentRefs:
+    - name: envoy-gateway
+      namespace: envoy-gateway-system
+      sectionName: https
+
+  hostnames:
+    - "brot.epy.ovh"
+
+  rules:
+    - backendRefs:
+        - group: ""
+          kind: Service
+          name: brot-app
+          port: 80
+          weight: 1
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
