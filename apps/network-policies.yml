@@ -25,3 +25,31 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+
+metadata:
+  name: allow-envoy-to-argocd-server
+
+spec:
+  description: "Allow Envoy Gateway to reach pods labeled app.kubernetes.io/name=argocd-server"
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-server
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: envoy-gateway-system
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: envoy-gateway-system
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
