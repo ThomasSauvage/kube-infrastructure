@@ -31,7 +31,12 @@ rollOutCiliumPods: true
 
 hubble:
   enabled: true
+  tls:
+    enabled: false
+  relay:
+    enabled: true
   ui:
+    enabled: true
     # Restart Cilium pods when Cilium config changes
     rollOutPods: true
   metrics:

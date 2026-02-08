@@ -21,7 +21,7 @@ spec:
   source:
     chart: cilium
     repoURL: https://helm.cilium.io/
-    targetRevision: 1.19.0-rc.0
+    targetRevision: 1.19.0
 
     helm:
       releaseName: cilium
@@ -51,7 +51,12 @@ spec:
 
         hubble:
           enabled: true
+          tls:
+            enabled: false
+          relay:
+            enabled: true
           ui:
+            enabled: true
             # Restart Cilium pods when Cilium config changes
             rollOutPods: true
           metrics:
