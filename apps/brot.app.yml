@@ -5,6 +5,46 @@ metadata:
   name: brot-app
 
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gha-rollout-restart
+  namespace: brot-app
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: gha-rollout-restart
+  namespace: brot-app
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    resourceNames: ["brot-app"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: gha-rollout-restart
+  namespace: brot-app
+subjects:
+  - kind: ServiceAccount
+    name: gha-rollout-restart
+    namespace: brot-app
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: gha-rollout-restart
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gha-rollout-restart-token
+  namespace: brot-app
+  annotations:
+    kubernetes.io/service-account.name: gha-rollout-restart
+type: kubernetes.io/service-account-token
+---
 kind: Deployment
 apiVersion: apps/v1
 
@@ -38,6 +78,7 @@ spec:
       containers:
         - name: brot-app
           image: ghcr.io/thomassauvage/brot-app:latest
+          imagePullPolicy: Always
           # Add additional security settings to the container
           securityContext:
             allowPrivilegeEscalation: false
