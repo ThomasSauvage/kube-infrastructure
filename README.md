@@ -38,6 +38,7 @@ kubectl get pods -A
   - HTTP to HTTPS redirection support
   - HTTP3 / QUIC support
 - Network policies with [Cilium Network Policies](https://docs.cilium.io/en/stable/security/policy/)
+- Cilium's Hubble UI for network observability, useful for network policy troubleshooting
 - Certificate management with [Cert manager](https://cert-manager.io/)
 - Certificate autorenewal using OVH DNS challenges with [Cert manager webhook OVH](https://aureq.github.io/cert-manager-webhook-ovh/)
 - Secret storage with [Git crypt](https://github.com/AGWA/git-crypt)
@@ -45,6 +46,7 @@ kubectl get pods -A
   - [Google online boutique](https://github.com/GoogleCloudPlatform/microservices-demo)
   - [whoami](https://github.com/traefik/whoami)
   - [BRoT app](https://github.com/ThomasSauvage/brot-app) with a CI/CD pipeline building and pushing container images to GHCR
+- Automatic image rollout for the BRoT app on the Github Actions CI/CD
 
 ## Creating the cluster
 
