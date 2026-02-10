@@ -38,7 +38,8 @@ kubectl get pods -A
   - HTTP to HTTPS redirection support
   - HTTP3 / QUIC support
 - Network policies with [Cilium Network Policies](https://docs.cilium.io/en/stable/security/policy/)
-- Cilium's Hubble UI for network observability, useful for network policy troubleshooting
+- Cilium's [Hubble](https://docs.cilium.io/en/stable/observability/hubble/) for network observability, useful for network policy troubleshooting
+  - [Basic auth](https://gateway.envoyproxy.io/docs/tasks/security/basic-auth) to secure the access to Hubble UI
 - Certificate management with [Cert manager](https://cert-manager.io/)
 - Certificate autorenewal using OVH DNS challenges with [Cert manager webhook OVH](https://aureq.github.io/cert-manager-webhook-ovh/)
 - Secret storage with [Git crypt](https://github.com/AGWA/git-crypt)

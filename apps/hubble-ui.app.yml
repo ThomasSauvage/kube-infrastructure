@@ -1,8 +1,10 @@
 apiVersion: v1
 kind: Service
+
 metadata:
   name: hubble-ui
   namespace: kube-system
+
 spec:
   selector:
     k8s-app: hubble-ui
@@ -10,12 +12,15 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 8081
+
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
+
 metadata:
   name: hubble-ui
   namespace: kube-system
+
 spec:
   parentRefs:
     - name: envoy-gateway
@@ -34,3 +39,22 @@ spec:
         - path:
             type: PathPrefix
             value: /
+
+---
+# see: https://gateway.envoyproxy.io/docs/tasks/security/basic-auth
+apiVersion: gateway.envoyproxy.io/v1alpha1
+
+kind: SecurityPolicy
+metadata:
+  name: basic-auth-hubble
+  namespace: kube-system
+
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: hubble-ui
+  basicAuth:
+    users:
+      # name of the secret
+      name: "basic-auth-credentials"
