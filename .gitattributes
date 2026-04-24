@@ -9,3 +9,7 @@
 *.secret.k8s.yml filter=git-crypt diff=git-crypt
 *.secret.yml filter=git-crypt diff=git-crypt
 *.secret filter=git-crypt diff=git-crypt
+
+# Ensure GitHub Linguist counts YAML files in language statistics
+*.yml linguist-detectable
+*.yaml linguist-detectable
