@@ -46,7 +46,7 @@ cf. https://github.com/settings/personal-access-tokens/new
 Options:
 
 - Expiration: No expiration
-- Select scopes: ThomasSauvage/br-over-telecom
+- Select scopes: ThomasSauvage/kube-infrastructure
 - Permissions: Contents: Read access
 
 ## Applying secrets
